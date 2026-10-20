@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Watch case outline (centered 21..87) -->
+    <path
+        android:fillColor="#24302A"
+        android:strokeColor="#3D5046"
+        android:strokeWidth="1.5"
+        android:pathData="M34,22 H74 L86,34 V74 L74,86 H34 L22,74 V34 Z" />
+
+    <!-- Screw / accent dots on bezel -->
+    <path
+        android:fillColor="#768B80"
+        android:pathData="M27,27 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 M81,27 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 M27,81 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 M81,81 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+
+    <!-- Watch bezel inner glass frame -->
+    <path
+        android:fillColor="#101815"
+        android:pathData="M33,29 H75 C77,29 79,31 79,33 V75 C79,77 77,79 75,79 H33 C31,79 29,77 29,75 V33 C29,31 31,29 33,29 Z" />
+
+    <!-- Vintage Al-Fajr LCD Screen (#9EA78C) -->
+    <path
+        android:fillColor="#9EA78C"
+        android:pathData="M35,32 H73 C74.5,32 76,33.5 76,35 V73 C76,74.5 74.5,76 73,76 H35 C33.5,76 32,74.5 32,73 V35 C32,33.5 33.5,32 35,32 Z" />
+
+    <!-- LCD Top Bar: Crescent Moon & Fajr Star -->
+    <path
+        android:fillColor="#1E2721"
+        android:pathData="M43,36 C40.5,36 38.5,38 38.5,40.5 C38.5,43 40.5,45 43,45 C41.5,44.2 40.5,42.5 40.5,40.5 C40.5,38.5 41.5,36.8 43,36 Z" />
+    <path
+        android:fillColor="#1E2721"
+        android:pathData="M44.5,39.5 L45.2,40.5 L44.5,41.5 L43.5,40.8 Z" />
+
+    <!-- Arabic Fajr / Al-Fajr insignia bar -->
+    <path
+        android:fillColor="#1E2721"
+        android:pathData="M50,37 H68 V38.5 H50 Z M52,40 H66 V41.2 H52 Z" />
+
+    <!-- LCD Digital Clock Digits Representation (Classic 7-Segment look) -->
+    <!-- Digit '0' or '1' -->
+    <path
+        android:fillColor="#1A221C"
+        android:pathData="M37,47 H39 V61 H37 Z M41,47 H43 V61 H41 Z M37,47 H43 V49 H37 Z M37,59 H43 V61 H37 Z" />
+    <!-- Digit '5' -->
+    <path
+        android:fillColor="#1A221C"
+        android:pathData="M46,47 H53 V49 H48 V53 H53 V61 H46 V59 H51 V55 H46 Z" />
+    <!-- Colon ':' -->
+    <path
+        android:fillColor="#1A221C"
+        android:pathData="M55.5,51 H57.5 V53 H55.5 Z M55.5,56 H57.5 V58 H55.5 Z" />
+    <!-- Digit '3' -->
+    <path
+        android:fillColor="#1A221C"
+        android:pathData="M60,47 H67 V53 H63 V55 H67 V61 H60 V59 H65 V55 H62 V53 H65 V49 H60 Z" />
+    <!-- Digit '0' -->
+    <path
+        android:fillColor="#1A221C"
+        android:pathData="M70,47 H76 V61 H70 Z M72,49 H74 V59 H72 Z" />
+
+    <!-- LCD Bottom Prayer Row indicator pips -->
+    <path
+        android:fillColor="#1E2721"
+        android:pathData="M35,66 H40 V68 H35 Z M42,66 H47 V68 H42 Z M49,66 H54 V68 H49 Z M56,66 H61 V68 H56 Z M63,66 H68 V68 H63 Z M70,66 H75 V68 H70 Z" />
+
+    <!-- Bottom subtext bar -->
+    <path
+        android:fillColor="#283830"
+        android:pathData="M40,71 H68 V72.5 H40 Z" />
+</vector>

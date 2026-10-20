@@ -1,0 +1,6 @@
+{
+  "name": "Al-Fajr Watch",
+  "description": "Retro digital Islamic prayer watch app inspired by classic Al-Fajr watches with accurate offline prayer times, vintage LCD display, Fajr relative alarm, and digital watch audio beeps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
