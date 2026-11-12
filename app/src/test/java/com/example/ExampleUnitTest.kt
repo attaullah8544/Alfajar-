@@ -55,4 +55,49 @@ class ExampleUnitTest {
         val hijriDateStr = HijriCalendarHelper.getHijriDate(LocalDate.of(2026, 10, 19), offsetDays = 0)
         assertTrue(hijriDateStr.contains("AH"))
     }
+
+    @Test
+    fun hijriCalendarHelper_returnsDetailedHijriComponents() {
+        val details = HijriCalendarHelper.getHijriDetails(LocalDate.of(2026, 10, 19), offsetDays = 0)
+        assertTrue(details.day in 1..30)
+        assertTrue(details.monthNumber in 1..12)
+        assertTrue(details.year >= 1445)
+        assertTrue(details.monthNameEn.isNotEmpty())
+        assertTrue(details.monthNameAr.isNotEmpty())
+        assertTrue(details.fullDateAr.contains("هـ"))
+    }
+
+    @Test
+    fun hijriCalendarHelper_handlesOffsetDaysCorrectly() {
+        val base = HijriCalendarHelper.getHijriDetails(LocalDate.of(2026, 10, 19), offsetDays = 0)
+        val plusOne = HijriCalendarHelper.getHijriDetails(LocalDate.of(2026, 10, 19), offsetDays = 1)
+        val minusOne = HijriCalendarHelper.getHijriDetails(LocalDate.of(2026, 10, 19), offsetDays = -1)
+
+        // Day should reflect day offset
+        assertTrue(base.day != plusOne.day || base.monthNumber != plusOne.monthNumber)
+        assertTrue(base.day != minusOne.day || base.monthNumber != minusOne.monthNumber)
+    }
+
+    @Test
+    fun locationDefaultsHelper_recommendsCorrectMethodAndMadhab() {
+        // Pakistan -> Karachi, Hanafi
+        val pkMethod = com.example.model.LocationDefaultsHelper.recommendCalculationMethod("pk", "Pakistan")
+        val pkMadhab = com.example.model.LocationDefaultsHelper.recommendMadhab("pk", "Pakistan")
+        assertEquals(CalculationMethod.KARACHI, pkMethod)
+        assertEquals(Madhab.HANAFI, pkMadhab)
+
+        // Saudi Arabia -> Umm Al Qura, Shafi'i
+        val saMethod = com.example.model.LocationDefaultsHelper.recommendCalculationMethod("sa", "Saudi Arabia")
+        val saMadhab = com.example.model.LocationDefaultsHelper.recommendMadhab("sa", "Saudi Arabia")
+        assertEquals(CalculationMethod.UMM_AL_QURA, saMethod)
+        assertEquals(Madhab.SHAFI, saMadhab)
+
+        // Egypt -> Egyptian
+        val egMethod = com.example.model.LocationDefaultsHelper.recommendCalculationMethod("eg", "Egypt")
+        assertEquals(CalculationMethod.EGYPTIAN, egMethod)
+
+        // USA -> North America
+        val usMethod = com.example.model.LocationDefaultsHelper.recommendCalculationMethod("us", "United States")
+        assertEquals(CalculationMethod.NORTH_AMERICA, usMethod)
+    }
 }

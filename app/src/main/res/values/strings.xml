@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Al-Fajr Watch</string>
+    <string name="widget_full_name">Al-Fajr Prayer Watch</string>
+    <string name="widget_full_description">Retro digital Islamic LCD watch face with 6 prayer times and next prayer countdown.</string>
+    <string name="widget_compact_name">Al-Fajr Next Prayer</string>
+    <string name="widget_compact_description">Compact LCD countdown timer to the next upcoming prayer.</string>
 </resources>

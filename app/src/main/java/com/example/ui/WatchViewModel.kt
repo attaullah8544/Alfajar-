@@ -80,7 +80,7 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
         val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
         val gregorianDate = dateFormat.format(now).uppercase()
 
-        val hijriDate = HijriCalendarHelper.getHijriDate(
+        val hijriDetails = HijriCalendarHelper.getHijriDetails(
             localDate = LocalDate.now(),
             offsetDays = currentSettings.hijriOffsetDays
         )
@@ -108,7 +108,9 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
                 amPm = amPm,
                 dayOfWeek = dayOfWeek,
                 gregorianDate = gregorianDate,
-                hijriDate = hijriDate,
+                hijriDate = hijriDetails.fullDateEn,
+                hijriDateArabic = hijriDetails.fullDateAr,
+                hijriDetails = hijriDetails,
                 prayers = calc.prayers,
                 nextPrayer = calc.nextPrayer,
                 countdownToNext = countdownStr,
@@ -229,16 +231,126 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
         updateSettings { it.copy(prayerAlertEnabled = nextAlert) }
     }
 
+    // Online Location Search state
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _searchResults = MutableStateFlow<List<com.example.network.NominatimResult>>(emptyList())
+    val searchResults: StateFlow<List<com.example.network.NominatimResult>> = _searchResults.asStateFlow()
+
+    private val _isSearchingLocation = MutableStateFlow(false)
+    val isSearchingLocation: StateFlow<Boolean> = _isSearchingLocation.asStateFlow()
+
+    private val _searchError = MutableStateFlow<String?>(null)
+    val searchError: StateFlow<String?> = _searchError.asStateFlow()
+
+    private var searchJob: Job? = null
+
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query
+        _searchError.value = null
+        searchJob?.cancel()
+        if (query.trim().length < 2) {
+            _searchResults.value = emptyList()
+            _isSearchingLocation.value = false
+            return
+        }
+
+        searchJob = viewModelScope.launch {
+            delay(400L) // Debounce typing
+            _isSearchingLocation.value = true
+            try {
+                val results = com.example.network.NetworkClient.geocodingService.searchLocations(query.trim())
+                _searchResults.value = results
+                _searchError.value = if (results.isEmpty()) "No locations found online" else null
+            } catch (e: Exception) {
+                _searchError.value = "Failed to connect to online location service"
+                _searchResults.value = emptyList()
+            } finally {
+                _isSearchingLocation.value = false
+            }
+        }
+    }
+
+    /**
+     * Sets everything according to the selected online location:
+     * - Coordinates (lat / lng)
+     * - City & Country labels
+     * - Calculation Method (Karachi, Umm Al-Qura, ISNA, MWL, Egyptian, Dubai, etc.)
+     * - Asr Madhab (Hanafi vs Shafi'i/Standard based on regional practice)
+     * - Recalculates prayer schedule, Qibla bearing, and Kaaba distance immediately
+     */
+    fun selectOnlineLocation(result: com.example.network.NominatimResult) {
+        val sound = _state.value.settings.soundEnabled
+        audioSynthesizer.playButtonBeep(sound)
+
+        val lat = result.lat.toDoubleOrNull() ?: return
+        val lon = result.lon.toDoubleOrNull() ?: return
+
+        val cityName = result.address?.bestCityName
+            ?: result.name
+            ?: result.displayName.split(",").firstOrNull()?.trim()
+            ?: "LOCATION"
+
+        val countryName = result.address?.country
+        val countryCode = result.address?.countryCode
+
+        // Auto-detect optimal calculation method and madhab for the selected region
+        val recommendedMethod = com.example.model.LocationDefaultsHelper.recommendCalculationMethod(
+            countryCode = countryCode,
+            countryName = countryName
+        )
+        val recommendedMadhab = com.example.model.LocationDefaultsHelper.recommendMadhab(
+            countryCode = countryCode,
+            countryName = countryName
+        )
+
+        val cityPreset = CityPreset(
+            id = "custom_${result.placeId ?: System.currentTimeMillis()}",
+            name = cityName,
+            country = countryName ?: "",
+            latitude = lat,
+            longitude = lon,
+            defaultMethod = recommendedMethod
+        )
+
+        updateSettings {
+            it.copy(
+                selectedCity = cityPreset,
+                customLat = lat,
+                customLng = lon,
+                locationLabel = cityName.uppercase().take(12),
+                country = countryName,
+                countryCode = countryCode?.uppercase(),
+                calculationMethod = recommendedMethod,
+                madhab = recommendedMadhab
+            )
+        }
+
+        // Clear search
+        _searchQuery.value = ""
+        _searchResults.value = emptyList()
+    }
+
     fun selectCity(city: CityPreset) {
         val sound = _state.value.settings.soundEnabled
         audioSynthesizer.playButtonBeep(sound)
+
+        val recommendedMadhab = com.example.model.LocationDefaultsHelper.recommendMadhab(
+            countryCode = null,
+            countryName = city.country
+        )
+
         updateSettings {
             it.copy(
                 selectedCity = city,
                 customLat = null,
                 customLng = null,
-                locationLabel = city.name.uppercase(),
-                calculationMethod = city.defaultMethod
+                locationLabel = city.name.uppercase().take(12),
+                country = city.country,
+                countryCode = null,
+                calculationMethod = city.defaultMethod,
+                madhab = recommendedMadhab
             )
         }
     }
@@ -265,12 +377,42 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
     fun setGpsLocation(lat: Double, lng: Double, label: String = "GPS LOCATION") {
         val sound = _state.value.settings.soundEnabled
         audioSynthesizer.playButtonBeep(sound)
-        updateSettings {
-            it.copy(
-                customLat = lat,
-                customLng = lng,
-                locationLabel = label.uppercase()
-            )
+
+        // Reverse geocode online to resolve city, country, method, and madhab
+        viewModelScope.launch {
+            try {
+                val reverse = com.example.network.NetworkClient.geocodingService.reverseGeocode(lat, lng)
+                val cityName = reverse.address?.bestCityName
+                    ?: reverse.name
+                    ?: label
+
+                val countryName = reverse.address?.country
+                val countryCode = reverse.address?.countryCode
+
+                val method = com.example.model.LocationDefaultsHelper.recommendCalculationMethod(countryCode, countryName)
+                val madhab = com.example.model.LocationDefaultsHelper.recommendMadhab(countryCode, countryName)
+
+                updateSettings {
+                    it.copy(
+                        customLat = lat,
+                        customLng = lng,
+                        locationLabel = cityName.uppercase().take(12),
+                        country = countryName,
+                        countryCode = countryCode?.uppercase(),
+                        calculationMethod = method,
+                        madhab = madhab
+                    )
+                }
+            } catch (e: Exception) {
+                // Offline fallback for GPS
+                updateSettings {
+                    it.copy(
+                        customLat = lat,
+                        customLng = lng,
+                        locationLabel = label.uppercase().take(12)
+                    )
+                }
+            }
         }
     }
 
@@ -297,6 +439,9 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
         preferences.saveSettings(updated)
         _state.update { it.copy(settings = updated) }
         tick()
+        try {
+            com.example.widget.AlFajrWidgetProvider.updateAllWidgets(getApplication())
+        } catch (_: Exception) {}
     }
 
     override fun onCleared() {

@@ -35,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -242,6 +243,18 @@ fun AlFajrWatchApp(viewModel: WatchViewModel) {
                             )
                         }
 
+                        // Widgets Quick Button
+                        IconButton(
+                            onClick = { showSettingsDialog = true },
+                            modifier = Modifier.testTag("btn_top_widgets")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Widgets,
+                                contentDescription = "Add Home Widgets",
+                                tint = PrimaryGold
+                            )
+                        }
+
                         // Settings button
                         IconButton(
                             onClick = { showSettingsDialog = true },
@@ -317,16 +330,33 @@ fun AlFajrWatchApp(viewModel: WatchViewModel) {
 
         // Settings Dialog
         if (showSettingsDialog) {
+            val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+            val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
+            val isSearching by viewModel.isSearchingLocation.collectAsStateWithLifecycle()
+            val searchError by viewModel.searchError.collectAsStateWithLifecycle()
+
             SettingsDialog(
                 settings = state.settings,
-                onDismiss = { showSettingsDialog = false },
+                searchQuery = searchQuery,
+                searchResults = searchResults,
+                isSearching = isSearching,
+                searchError = searchError,
+                onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
+                onOnlineLocationSelected = {
+                    viewModel.selectOnlineLocation(it)
+                    scope.launch {
+                        val name = it.address?.bestCityName ?: it.name ?: it.displayName.split(",").firstOrNull() ?: "Location"
+                        snackbarHostState.showSnackbar("Watch configured for $name (${state.settings.calculationMethod.name})")
+                    }
+                },
                 onCitySelected = { viewModel.selectCity(it) },
                 onMethodSelected = { viewModel.setCalculationMethod(it) },
                 onMadhabToggled = { viewModel.toggleMadhab() },
                 onTimeFormatToggled = { viewModel.toggleTimeFormat() },
                 onSoundToggled = { viewModel.toggleSound() },
                 onFajrOffsetChanged = { viewModel.setFajrOffset(it) },
-                onHijriOffsetAdjusted = { viewModel.adjustHijriOffset(it) }
+                onHijriOffsetAdjusted = { viewModel.adjustHijriOffset(it) },
+                onDismiss = { showSettingsDialog = false }
             )
         }
     }

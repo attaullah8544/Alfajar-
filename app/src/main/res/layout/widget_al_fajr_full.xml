@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_lcd_background"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Top Status Bar: Location, Hijri & Flags -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_widget_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="KARACHI"
+            android:textColor="#151E18"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_widget_flags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ALM • PRAY • HNF"
+            android:textColor="#151E18"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_widget_gregorian"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MON 19 OCT"
+            android:textColor="#151E18"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_widget_hijri"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="08 RABI' II 1448 AH"
+            android:textColor="#151E18"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Center Clock Display -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_widget_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:00"
+            android:textColor="#151E18"
+            android:textSize="38sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_widget_ampm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="PM"
+            android:textColor="#151E18"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Next Prayer Countdown Banner -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/widget_inner_banner"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NEXT: "
+            android:textColor="#9EA78C"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_widget_next_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ASR (العصر)"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_widget_next_countdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="IN 01:24:00"
+            android:textColor="#E5BA69"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 6 Prayer Times Table -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- FAJR -->
+        <LinearLayout
+            android:id="@+id/layout_fajr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:id="@+id/tv_label_fajr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FAJR"
+                android:textColor="#151E18"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_time_fajr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="05:12"
+                android:textColor="#151E18"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- SHUROOQ -->
+        <LinearLayout
+            android:id="@+id/layout_shurooq"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:id="@+id/tv_label_shurooq"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SHRQ"
+                android:textColor="#151E18"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_time_shurooq"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="06:28"
+                android:textColor="#151E18"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- DHUHR -->
+        <LinearLayout
+            android:id="@+id/layout_dhuhr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:id="@+id/tv_label_dhuhr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ZUHR"
+                android:textColor="#151E18"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_time_dhuhr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12:15"
+                android:textColor="#151E18"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- ASR -->
+        <LinearLayout
+            android:id="@+id/layout_asr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:id="@+id/tv_label_asr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ASR"
+                android:textColor="#151E18"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_time_asr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="03:45"
+                android:textColor="#151E18"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- MAGHRIB -->
+        <LinearLayout
+            android:id="@+id/layout_maghrib"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:id="@+id/tv_label_maghrib"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MAGH"
+                android:textColor="#151E18"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_time_maghrib"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="06:02"
+                android:textColor="#151E18"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- ISHA -->
+        <LinearLayout
+            android:id="@+id/layout_isha"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:id="@+id/tv_label_isha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ISHA"
+                android:textColor="#151E18"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_time_isha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="07:22"
+                android:textColor="#151E18"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -17,6 +17,8 @@ class WatchPreferences(context: Context) {
         private const val KEY_CUSTOM_LAT = "custom_lat"
         private const val KEY_CUSTOM_LNG = "custom_lng"
         private const val KEY_LOCATION_LABEL = "location_label"
+        private const val KEY_COUNTRY = "country"
+        private const val KEY_COUNTRY_CODE = "country_code"
         private const val KEY_CALC_METHOD = "calc_method"
         private const val KEY_MADHAB_HANAFI = "madhab_hanafi"
         private const val KEY_24_HOUR = "is_24_hour"
@@ -34,6 +36,8 @@ class WatchPreferences(context: Context) {
         val customLat = if (prefs.contains(KEY_CUSTOM_LAT)) prefs.getFloat(KEY_CUSTOM_LAT, 0f).toDouble() else null
         val customLng = if (prefs.contains(KEY_CUSTOM_LNG)) prefs.getFloat(KEY_CUSTOM_LNG, 0f).toDouble() else null
         val label = prefs.getString(KEY_LOCATION_LABEL, city.name.uppercase()) ?: city.name.uppercase()
+        val country = prefs.getString(KEY_COUNTRY, city.country) ?: city.country
+        val countryCode = prefs.getString(KEY_COUNTRY_CODE, null)
 
         val methodName = prefs.getString(KEY_CALC_METHOD, CalculationMethod.KARACHI.name)
         val method = try {
@@ -56,6 +60,8 @@ class WatchPreferences(context: Context) {
             customLat = customLat,
             customLng = customLng,
             locationLabel = label,
+            country = country,
+            countryCode = countryCode,
             calculationMethod = method,
             madhab = if (isHanafi) Madhab.HANAFI else Madhab.SHAFI,
             is24Hour = is24Hour,
@@ -79,6 +85,8 @@ class WatchPreferences(context: Context) {
                 remove(KEY_CUSTOM_LNG)
             }
             putString(KEY_LOCATION_LABEL, settings.locationLabel)
+            putString(KEY_COUNTRY, settings.country)
+            putString(KEY_COUNTRY_CODE, settings.countryCode)
             putString(KEY_CALC_METHOD, settings.calculationMethod.name)
             putBoolean(KEY_MADHAB_HANAFI, settings.madhab == Madhab.HANAFI)
             putBoolean(KEY_24_HOUR, settings.is24Hour)

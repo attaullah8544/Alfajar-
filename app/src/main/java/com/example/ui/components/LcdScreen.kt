@@ -158,33 +158,54 @@ private fun LcdTopStatusRow(
     ghostColor: Color
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Line 1: City / Location + Hijri Date
+        // Line 1: City / Location + Hijri Date in Arabic calligraphy & English
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = state.settings.locationLabel.take(12),
-                fontFamily = ChakraPetchFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                color = textColor,
-                letterSpacing = 0.5.sp
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = state.settings.locationLabel.take(10),
+                    fontFamily = ChakraPetchFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp,
+                    color = textColor,
+                    letterSpacing = 0.5.sp
+                )
+                if (state.settings.hijriOffsetDays != 0) {
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = "${if (state.settings.hijriOffsetDays > 0) "+" else ""}${state.settings.hijriOffsetDays}d",
+                        fontFamily = ShareTechMonoFamily,
+                        fontSize = 8.sp,
+                        color = textColor.copy(alpha = 0.7f)
+                    )
+                }
+            }
 
-            Text(
-                text = state.hijriDate,
-                fontFamily = ShareTechMonoFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                color = textColor
-            )
+            // Dual Hijri Display: Arabic Calligraphy + English
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = state.hijriDetails.monthNameAr,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = state.hijriDate,
+                    fontFamily = ShareTechMonoFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp,
+                    color = textColor
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(2.dp))
 
-        // Line 2: Day of Week + Gregorian Date + Watch Status Flags
+        // Line 2: Day of Week + Gregorian Date + Islamic Date Badge + Watch Status Flags
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -196,19 +217,20 @@ private fun LcdTopStatusRow(
                     text = state.dayOfWeek,
                     fontFamily = ChakraPetchFamily,
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = textColor,
                     modifier = Modifier
                         .background(textColor.copy(alpha = 0.15f), RoundedCornerShape(3.dp))
                         .padding(horizontal = 4.dp, vertical = 1.dp)
                 )
 
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(5.dp))
 
+                // Gregorian Date
                 Text(
                     text = state.gregorianDate,
                     fontFamily = ShareTechMonoFamily,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     color = textColor
                 )
             }
@@ -247,6 +269,28 @@ private fun LcdTopStatusRow(
                     isActive = state.settings.soundEnabled,
                     textColor = textColor,
                     ghostColor = ghostColor
+                )
+            }
+        }
+
+        // Special Islamic Event banner if today is a notable date
+        if (state.hijriDetails.specialIslamicDay != null) {
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(textColor.copy(alpha = 0.10f))
+                    .padding(horizontal = 6.dp, vertical = 1.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "★ ${state.hijriDetails.specialIslamicDay} ★",
+                    fontFamily = ChakraPetchFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 9.sp,
+                    color = textColor
                 )
             }
         }
