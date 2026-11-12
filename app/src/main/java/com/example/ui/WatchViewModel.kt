@@ -374,6 +374,12 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
         updateSettings { it.copy(hijriOffsetDays = newOffset) }
     }
 
+    fun setWidgetTransparency(percent: Int) {
+        val sound = _state.value.settings.soundEnabled
+        audioSynthesizer.playButtonBeep(sound)
+        updateSettings { it.copy(widgetTransparencyPercent = percent) }
+    }
+
     fun setGpsLocation(lat: Double, lng: Double, label: String = "GPS LOCATION") {
         val sound = _state.value.settings.soundEnabled
         audioSynthesizer.playButtonBeep(sound)

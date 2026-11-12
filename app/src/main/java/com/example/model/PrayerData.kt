@@ -95,7 +95,8 @@ data class WatchSettings(
     val prayerAlertEnabled: Boolean = true,
     val soundEnabled: Boolean = true,
     val hourlyChimeEnabled: Boolean = false,
-    val hijriOffsetDays: Int = 0
+    val hijriOffsetDays: Int = 0,
+    val widgetTransparencyPercent: Int = 0 // 0 = Solid/Classic, 25 = 25% Frost, 50 = 50% Medium, 75 = 75% Clear, 100 = 100% Fully Clear
 )
 
 data class WatchState(

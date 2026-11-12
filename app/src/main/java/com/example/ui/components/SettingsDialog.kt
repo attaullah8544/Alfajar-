@@ -90,6 +90,7 @@ fun SettingsDialog(
     onSoundToggled: () -> Unit,
     onFajrOffsetChanged: (Int) -> Unit,
     onHijriOffsetAdjusted: (Int) -> Unit,
+    onWidgetTransparencyChanged: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -209,7 +210,10 @@ fun SettingsDialog(
                         onMadhabToggled = onMadhabToggled,
                         onTimeFormatToggled = onTimeFormatToggled
                     )
-                    3 -> HomeWidgetsTab(settings = settings)
+                    3 -> HomeWidgetsTab(
+                        settings = settings,
+                        onWidgetTransparencyChanged = onWidgetTransparencyChanged
+                    )
                     4 -> AlarmAndHijriTab(
                         settings = settings,
                         onFajrOffsetChanged = onFajrOffsetChanged,
@@ -938,9 +942,21 @@ private fun AlarmAndHijriTab(
 }
 
 @Composable
-fun HomeWidgetsTab(settings: WatchSettings) {
+fun HomeWidgetsTab(
+    settings: WatchSettings,
+    onWidgetTransparencyChanged: (Int) -> Unit
+) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var pinMessage by remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+
+    val previewBgAlpha = when (settings.widgetTransparencyPercent) {
+        0 -> 0.95f
+        25 -> 0.72f
+        50 -> 0.45f
+        75 -> 0.22f
+        100 -> 0.04f
+        else -> 0.95f
+    }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -950,12 +966,123 @@ fun HomeWidgetsTab(settings: WatchSettings) {
             fontSize = 12.sp,
             color = PrimaryGold
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(3.dp))
         Text(
             text = "Bring the classic Al-Fajr green LCD prayer watch face directly onto your Android Home Screen.",
             fontSize = 11.sp,
             color = Color(0xFFA0B3A8)
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Widget Background Transparency Control Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("widget_transparency_card"),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF16231C)),
+            shape = RoundedCornerShape(12.dp),
+            border = CardDefaults.outlinedCardBorder().copy(
+                brush = androidx.compose.ui.graphics.SolidColor(Color(0xFF344A3E))
+            )
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "WIDGET TRANSPARENCY",
+                            fontFamily = ChakraPetchFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            color = PrimaryGold
+                        )
+                        Text(
+                            text = "Blend watch face with your wallpaper",
+                            fontSize = 10.sp,
+                            color = Color(0xFFA0B3A8)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color(0xFF23352B))
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = when (settings.widgetTransparencyPercent) {
+                                0 -> "0% (SOLID)"
+                                25 -> "25% (FROST)"
+                                50 -> "50% (MEDIUM)"
+                                75 -> "75% (CLEAR)"
+                                100 -> "100% (PURE GLASS)"
+                                else -> "${settings.widgetTransparencyPercent}%"
+                            },
+                            fontFamily = ChakraPetchFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp,
+                            color = PrimaryGold
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 5 Transparency Level Buttons
+                val levels = listOf(
+                    0 to "0% Solid",
+                    25 to "25% Frost",
+                    50 to "50% Med",
+                    75 to "75% Clear",
+                    100 to "100% Glass"
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    levels.forEach { (pct, label) ->
+                        val isSel = settings.widgetTransparencyPercent == pct
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (isSel) PrimaryGold else Color(0xFF1D2A22))
+                                .border(
+                                    1.dp,
+                                    if (isSel) PrimaryGold else Color(0xFF34453A),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .clickable { onWidgetTransparencyChanged(pct) }
+                                .testTag("btn_transparency_$pct")
+                                .padding(vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                fontFamily = ChakraPetchFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 10.sp,
+                                color = if (isSel) Color(0xFF0C1410) else Color(0xFFC5D9CE),
+                                maxLines = 1
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = "★ Applies instantly to all active home screen widgets.",
+                    fontSize = 9.sp,
+                    color = Color(0xFF8CA597)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -1011,28 +1138,41 @@ fun HomeWidgetsTab(settings: WatchSettings) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Miniature LCD Preview
+                // Miniature LCD Preview with Live Transparency
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFF9EA78C))
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                listOf(
+                                    Color(0xFF233930).copy(alpha = previewBgAlpha),
+                                    Color(0xFF15261E).copy(alpha = previewBgAlpha),
+                                    Color(0xFF0C1612).copy(alpha = previewBgAlpha)
+                                )
+                            )
+                        )
+                        .border(
+                            1.dp,
+                            if (settings.widgetTransparencyPercent == 100) Color(0x6684A996) else Color(0xFF4C7560),
+                            RoundedCornerShape(10.dp)
+                        )
                         .padding(8.dp)
                 ) {
                     Column {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(settings.locationLabel.take(12), fontFamily = ChakraPetchFamily, fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Color(0xFF151E18))
-                            Text("08 RABI' II 1448 AH", fontFamily = ShareTechMonoFamily, fontWeight = FontWeight.Bold, fontSize = 9.sp, color = Color(0xFF151E18))
+                            Text(settings.locationLabel.take(12), fontFamily = ChakraPetchFamily, fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Color(0xFFE4F0E8))
+                            Text("08 RABI' II 1448 AH", fontFamily = ShareTechMonoFamily, fontWeight = FontWeight.Bold, fontSize = 9.sp, color = Color(0xFFE4F0E8))
                         }
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                            Text("12:00", fontFamily = ShareTechMonoFamily, fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Color(0xFF151E18))
+                            Text("12:00", fontFamily = ShareTechMonoFamily, fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Color(0xFFE8F5EC))
                         }
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("FAJR 05:12", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFF151E18))
-                            Text("ZUHR 12:15", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFF151E18))
-                            Text("ASR 03:45", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFF151E18))
-                            Text("MAGH 06:02", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFF151E18))
-                            Text("ISHA 07:22", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFF151E18))
+                            Text("FAJR 05:12", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFFAAC2B4))
+                            Text("ZUHR 12:15", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFFAAC2B4))
+                            Text("ASR 03:45", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFFF2C979))
+                            Text("MAGH 06:02", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFFAAC2B4))
+                            Text("ISHA 07:22", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFFAAC2B4))
                         }
                     }
                 }
@@ -1093,12 +1233,25 @@ fun HomeWidgetsTab(settings: WatchSettings) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Miniature Compact Preview
+                // Miniature Compact Preview with Live Transparency
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFF9EA78C))
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                listOf(
+                                    Color(0xFF233930).copy(alpha = previewBgAlpha),
+                                    Color(0xFF15261E).copy(alpha = previewBgAlpha),
+                                    Color(0xFF0C1612).copy(alpha = previewBgAlpha)
+                                )
+                            )
+                        )
+                        .border(
+                            1.dp,
+                            if (settings.widgetTransparencyPercent == 100) Color(0x6684A996) else Color(0xFF4C7560),
+                            RoundedCornerShape(10.dp)
+                        )
                         .padding(8.dp)
                 ) {
                     Row(
@@ -1107,16 +1260,17 @@ fun HomeWidgetsTab(settings: WatchSettings) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text(settings.locationLabel.take(12), fontFamily = ChakraPetchFamily, fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Color(0xFF151E18))
-                            Text("NEXT: ASR (03:45 PM)", fontFamily = ChakraPetchFamily, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = Color(0xFF151E18))
+                            Text(settings.locationLabel.take(12), fontFamily = ChakraPetchFamily, fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Color(0xFFE4F0E8))
+                            Text("NEXT: ASR (03:45 PM)", fontFamily = ChakraPetchFamily, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = Color(0xFFF2C979))
                         }
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0xFF1A241F))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF0C1410).copy(alpha = if (settings.widgetTransparencyPercent == 100) 0.15f else 0.85f))
+                                .border(1.dp, Color(0xFF3B5647), RoundedCornerShape(6.dp))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
                         ) {
-                            Text("01:24:00", fontFamily = ShareTechMonoFamily, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color(0xFFE5BA69))
+                            Text("01:24:00", fontFamily = ShareTechMonoFamily, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color(0xFFF2C979))
                         }
                     }
                 }

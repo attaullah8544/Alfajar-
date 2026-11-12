@@ -97,8 +97,19 @@ class AlFajrWidgetProvider : AppWidgetProvider() {
                 setTextViewText(R.id.tv_widget_flags, flagsStr)
                 setTextViewText(R.id.tv_widget_gregorian, gregorianStr)
                 setTextViewText(R.id.tv_widget_hijri, hijriStr)
-                setTextViewText(R.id.tv_widget_clock, clockStr)
-                setTextViewText(R.id.tv_widget_ampm, if (is24H) "24H" else amPm)
+
+                // Configure live TextClock formats according to 12h / 24h setting
+                if (is24H) {
+                    setCharSequence(R.id.tc_widget_clock, "setFormat24Hour", "HH:mm")
+                    setCharSequence(R.id.tc_widget_clock, "setFormat12Hour", "HH:mm")
+                    setCharSequence(R.id.tc_widget_ampm, "setFormat24Hour", "")
+                    setCharSequence(R.id.tc_widget_ampm, "setFormat12Hour", "")
+                } else {
+                    setCharSequence(R.id.tc_widget_clock, "setFormat12Hour", "hh:mm")
+                    setCharSequence(R.id.tc_widget_clock, "setFormat24Hour", "hh:mm")
+                    setCharSequence(R.id.tc_widget_ampm, "setFormat12Hour", "a")
+                    setCharSequence(R.id.tc_widget_ampm, "setFormat24Hour", "a")
+                }
 
                 setTextViewText(
                     R.id.tv_widget_next_name,
@@ -108,6 +119,17 @@ class AlFajrWidgetProvider : AppWidgetProvider() {
 
                 // Bind 6 prayers
                 bindPrayerTimes(this, calc.prayers, is24H)
+
+                // Apply background transparency
+                val (bgRes, bannerRes) = when (settings.widgetTransparencyPercent) {
+                    100 -> R.drawable.widget_bg_trans_100 to R.drawable.widget_banner_trans_100
+                    75 -> R.drawable.widget_bg_trans_75 to R.drawable.widget_banner_trans_75
+                    50 -> R.drawable.widget_bg_trans_50 to R.drawable.widget_banner_trans_50
+                    25 -> R.drawable.widget_bg_trans_25 to R.drawable.widget_banner_trans_25
+                    else -> R.drawable.widget_lcd_background to R.drawable.widget_inner_banner
+                }
+                setInt(R.id.widget_root, "setBackgroundResource", bgRes)
+                setInt(R.id.layout_next_banner, "setBackgroundResource", bannerRes)
 
                 // Launch App when widget tapped
                 val intent = Intent(context, MainActivity::class.java).apply {

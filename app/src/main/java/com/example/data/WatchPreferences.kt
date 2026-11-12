@@ -28,6 +28,7 @@ class WatchPreferences(context: Context) {
         private const val KEY_SOUND_ENABLED = "sound_enabled"
         private const val KEY_HOURLY_CHIME = "hourly_chime"
         private const val KEY_HIJRI_OFFSET = "hijri_offset"
+        private const val KEY_WIDGET_TRANSPARENCY = "widget_transparency"
     }
 
     fun loadSettings(): WatchSettings {
@@ -54,6 +55,7 @@ class WatchPreferences(context: Context) {
         val sound = prefs.getBoolean(KEY_SOUND_ENABLED, true)
         val chime = prefs.getBoolean(KEY_HOURLY_CHIME, false)
         val hijriOffset = prefs.getInt(KEY_HIJRI_OFFSET, 0)
+        val transparency = prefs.getInt(KEY_WIDGET_TRANSPARENCY, 0)
 
         return WatchSettings(
             selectedCity = city,
@@ -70,7 +72,8 @@ class WatchPreferences(context: Context) {
             prayerAlertEnabled = prayerAlert,
             soundEnabled = sound,
             hourlyChimeEnabled = chime,
-            hijriOffsetDays = hijriOffset
+            hijriOffsetDays = hijriOffset,
+            widgetTransparencyPercent = transparency
         )
     }
 
@@ -96,6 +99,7 @@ class WatchPreferences(context: Context) {
             putBoolean(KEY_SOUND_ENABLED, settings.soundEnabled)
             putBoolean(KEY_HOURLY_CHIME, settings.hourlyChimeEnabled)
             putInt(KEY_HIJRI_OFFSET, settings.hijriOffsetDays)
+            putInt(KEY_WIDGET_TRANSPARENCY, settings.widgetTransparencyPercent)
             apply()
         }
     }

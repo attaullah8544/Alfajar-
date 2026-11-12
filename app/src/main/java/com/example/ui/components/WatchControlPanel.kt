@@ -66,21 +66,30 @@ fun WatchControlPanel(
         modifier = modifier
             .fillMaxWidth()
             .testTag("watch_control_panel"),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF141B17)),
-        shape = RoundedCornerShape(20.dp),
-        border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(Color(0xFF26352C)))
+        colors = CardDefaults.cardColors(containerColor = Color(0xD9101A15)),
+        shape = RoundedCornerShape(22.dp),
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                listOf(
+                    Color(0xFF537A66),
+                    Color(0xFF22352B),
+                    Color(0xFF3E5C4D)
+                )
+            )
+        )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(14.dp)
         ) {
-            // Mode Selector Bar
+            // Mode Selector Bar (Frosted Glass Container)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFF0F1512))
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF0C1410))
+                    .border(1.dp, Color(0xFF2A3D33), RoundedCornerShape(12.dp))
                     .padding(3.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
@@ -234,18 +243,26 @@ private fun WatchModeTab(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(7.dp))
-            .background(if (isSelected) PrimaryGold else Color.Transparent)
+            .clip(RoundedCornerShape(9.dp))
+            .background(
+                if (isSelected) {
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(PrimaryGold, Color(0xFFC79E47))
+                    )
+                } else {
+                    androidx.compose.ui.graphics.SolidColor(Color.Transparent)
+                }
+            )
             .clickable(onClick = onClick)
-            .padding(vertical = 6.dp),
+            .padding(vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = title,
             fontFamily = ChakraPetchFamily,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.ExtraBold,
             fontSize = 11.sp,
-            color = if (isSelected) Color(0xFF0F1512) else Color(0xFF8CA094)
+            color = if (isSelected) Color(0xFF0C1410) else Color(0xFF9CB1A5)
         )
     }
 }
@@ -262,16 +279,16 @@ private fun QuickActionButton(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (isActive) activeColor.copy(alpha = 0.15f) else Color(0xFF1B231F))
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isActive) activeColor.copy(alpha = 0.16f) else Color(0xFF131D18))
             .border(
                 1.dp,
-                if (isActive) activeColor.copy(alpha = 0.4f) else Color(0xFF2B3830),
-                RoundedCornerShape(10.dp)
+                if (isActive) activeColor.copy(alpha = 0.5f) else Color(0xFF2C3E34),
+                RoundedCornerShape(12.dp)
             )
             .clickable(onClick = onClick)
             .testTag(testTag)
-            .padding(horizontal = 6.dp, vertical = 8.dp),
+            .padding(horizontal = 6.dp, vertical = 9.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -281,7 +298,7 @@ private fun QuickActionButton(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isActive) activeColor else Color(0xFF758A7E),
+                tint = if (isActive) activeColor else Color(0xFF88A092),
                 modifier = Modifier.size(14.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
@@ -290,7 +307,7 @@ private fun QuickActionButton(
                 fontFamily = ChakraPetchFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 10.sp,
-                color = if (isActive) activeColor else Color(0xFFB0C2B7)
+                color = if (isActive) activeColor else Color(0xFFC4D5CB)
             )
         }
     }

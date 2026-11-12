@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="KARACHI"
-            android:textColor="#151E18"
+            android:textColor="#E5BA69"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ALM • PRAY • HNF"
-            android:textColor="#151E18"
+            android:textColor="#A0B8AB"
             android:textSize="10sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="MON 19 OCT"
-            android:textColor="#151E18"
+            android:textColor="#C5D9CE"
             android:textSize="11sp" />
 
         <TextView
@@ -55,56 +55,59 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="08 RABI' II 1448 AH"
-            android:textColor="#151E18"
+            android:textColor="#E8F2EC"
             android:textSize="11sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Center Clock Display -->
+    <!-- Center Live Clock Display using TextClock (automatically updates every second without battery drain) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="4dp"
         android:gravity="center"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_widget_clock"
+        <TextClock
+            android:id="@+id/tc_widget_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12:00"
-            android:textColor="#151E18"
-            android:textSize="38sp"
+            android:format12Hour="hh:mm"
+            android:format24Hour="HH:mm"
+            android:textColor="#F4FAF6"
+            android:textSize="36sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tv_widget_ampm"
+        <TextClock
+            android:id="@+id/tc_widget_ampm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:text="PM"
-            android:textColor="#151E18"
-            android:textSize="14sp"
+            android:format12Hour="a"
+            android:format24Hour=""
+            android:textColor="#E5BA69"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Next Prayer Countdown Banner -->
     <LinearLayout
+        android:id="@+id/layout_next_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/widget_inner_banner"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
+        android:paddingHorizontal="10dp"
         android:paddingVertical="4dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="NEXT: "
-            android:textColor="#9EA78C"
-            android:textSize="11sp"
+            android:textColor="#8FB5A2"
+            android:textSize="10sp"
             android:textStyle="bold" />
 
         <TextView
@@ -143,14 +146,14 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="2dp">
+            android:paddingVertical="3dp">
 
             <TextView
                 android:id="@+id/tv_label_fajr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="FAJR"
-                android:textColor="#151E18"
+                android:textColor="#8FB5A2"
                 android:textSize="9sp"
                 android:textStyle="bold" />
 
@@ -159,7 +162,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="05:12"
-                android:textColor="#151E18"
+                android:textColor="#F4FAF6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -172,14 +175,14 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="2dp">
+            android:paddingVertical="3dp">
 
             <TextView
                 android:id="@+id/tv_label_shurooq"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SHRQ"
-                android:textColor="#151E18"
+                android:textColor="#8FB5A2"
                 android:textSize="9sp"
                 android:textStyle="bold" />
 
@@ -188,7 +191,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="06:28"
-                android:textColor="#151E18"
+                android:textColor="#F4FAF6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -201,14 +204,14 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="2dp">
+            android:paddingVertical="3dp">
 
             <TextView
                 android:id="@+id/tv_label_dhuhr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ZUHR"
-                android:textColor="#151E18"
+                android:textColor="#8FB5A2"
                 android:textSize="9sp"
                 android:textStyle="bold" />
 
@@ -217,7 +220,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="12:15"
-                android:textColor="#151E18"
+                android:textColor="#F4FAF6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -230,14 +233,14 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="2dp">
+            android:paddingVertical="3dp">
 
             <TextView
                 android:id="@+id/tv_label_asr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ASR"
-                android:textColor="#151E18"
+                android:textColor="#8FB5A2"
                 android:textSize="9sp"
                 android:textStyle="bold" />
 
@@ -246,7 +249,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="03:45"
-                android:textColor="#151E18"
+                android:textColor="#F4FAF6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -259,14 +262,14 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="2dp">
+            android:paddingVertical="3dp">
 
             <TextView
                 android:id="@+id/tv_label_maghrib"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="MAGH"
-                android:textColor="#151E18"
+                android:textColor="#8FB5A2"
                 android:textSize="9sp"
                 android:textStyle="bold" />
 
@@ -275,7 +278,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="06:02"
-                android:textColor="#151E18"
+                android:textColor="#F4FAF6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -288,14 +291,14 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="2dp">
+            android:paddingVertical="3dp">
 
             <TextView
                 android:id="@+id/tv_label_isha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ISHA"
-                android:textColor="#151E18"
+                android:textColor="#8FB5A2"
                 android:textSize="9sp"
                 android:textStyle="bold" />
 
@@ -304,7 +307,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="07:22"
-                android:textColor="#151E18"
+                android:textColor="#F4FAF6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>

@@ -90,23 +90,30 @@ fun WatchBezel(
                 modifier = Modifier
                     .width(320.dp)
                     .height(390.dp)
-                    .shadow(16.dp, RoundedCornerShape(36.dp))
+                    .shadow(20.dp, RoundedCornerShape(36.dp), spotColor = Color(0xFF558A72), ambientColor = Color(0xFF000000))
                     .clip(RoundedCornerShape(36.dp))
                     .background(
                         Brush.verticalGradient(
                             listOf(
-                                Color(0xFF26322C),
-                                WatchCaseSurface,
-                                WatchCaseDark,
-                                Color(0xFF141A17)
+                                Color(0xFF2B3A33),
+                                Color(0xFF1B2722),
+                                Color(0xFF101714),
+                                Color(0xFF080D0B)
                             )
                         )
                     )
-                    .border(3.dp, Color(0xFF3B4D43), RoundedCornerShape(36.dp))
-                    .border(6.dp, Color(0xFF1B231F), RoundedCornerShape(36.dp))
-                    .padding(12.dp)
+                    .border(2.5.dp, Brush.linearGradient(
+                        listOf(
+                            Color(0xFF7EAA94),
+                            Color(0xFF2A3D33),
+                            Color(0xFF5A7D6C),
+                            Color(0xFF1B2822)
+                        )
+                    ), RoundedCornerShape(36.dp))
+                    .border(5.dp, Color(0xFF101714), RoundedCornerShape(36.dp))
+                    .padding(10.dp)
             ) {
-                // Bezel Screws Canvas
+                // Bezel Screws & Specular Highlights Canvas
                 BezelDecorations()
 
                 Column(
@@ -126,10 +133,10 @@ fun WatchBezel(
                             fontFamily = ChakraPetchFamily,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF7E9487)
+                            color = Color(0xFF8CA597)
                         )
 
-                        // Iconic AL-FAJR Golden Branding
+                        // Iconic AL-FAJR Golden Glass Branding
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
@@ -149,9 +156,9 @@ fun WatchBezel(
                                 )
                             }
                             Text(
-                                text = "ISLAMIC PRAYER WATCH",
+                                text = "SAPPHIRE GLASS • ISLAMIC CHRONO",
                                 fontFamily = ChakraPetchFamily,
-                                fontSize = 8.sp,
+                                fontSize = 7.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = WatchGoldMuted,
                                 letterSpacing = 1.sp
@@ -163,13 +170,13 @@ fun WatchBezel(
                             fontFamily = ChakraPetchFamily,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF7E9487)
+                            color = Color(0xFF8CA597)
                         )
                     }
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // THE LCD SCREEN
+                    // THE LCD SCREEN (Glassy Sapphire Emerald)
                     LcdScreen(
                         state = state,
                         onModeClick = onModeClick,
@@ -193,7 +200,7 @@ fun WatchBezel(
                             fontFamily = ChakraPetchFamily,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF7E9487)
+                            color = Color(0xFF8CA597)
                         )
 
                         Text(
@@ -201,7 +208,7 @@ fun WatchBezel(
                             fontFamily = ChakraPetchFamily,
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF6B7E74),
+                            color = Color(0xFF759183),
                             letterSpacing = 1.sp
                         )
 
@@ -210,7 +217,7 @@ fun WatchBezel(
                             fontFamily = ChakraPetchFamily,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF7E9487)
+                            color = Color(0xFF8CA597)
                         )
                     }
                 }
@@ -269,14 +276,15 @@ private fun WatchSideButton(
                     Brush.verticalGradient(
                         listOf(
                             WatchButtonSteel,
-                            Color(0xFF53635B),
-                            Color(0xFF28322D)
+                            Color(0xFF6B8074),
+                            Color(0xFF334039),
+                            Color(0xFF1E2722)
                         )
                     )
                 )
                 .border(
                     1.dp,
-                    Color(0xFF6B7E74),
+                    Color(0xFF88A897),
                     if (isLeft) RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
                     else RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
                 )
@@ -292,10 +300,11 @@ private fun WatchSideButton(
 @Composable
 private fun BezelDecorations() {
     Canvas(modifier = Modifier.fillMaxWidth().height(360.dp)) {
-        val screwColor = Color(0xFF4C5E53)
-        val screwHighlight = Color(0xFF7B9183)
+        val screwColor = Color(0xFF3D5246)
+        val screwHighlight = Color(0xFFA5C9B6)
+        val goldAccent = Color(0xFFD4AF37)
 
-        // 4 corner watch screw accents
+        // 4 corner watch screw accents with gold & sapphire reflections
         val corners = listOf(
             Offset(20.dp.toPx(), 20.dp.toPx()),
             Offset(size.width - 20.dp.toPx(), 20.dp.toPx()),
@@ -304,8 +313,9 @@ private fun BezelDecorations() {
         )
 
         corners.forEach { pos ->
-            drawCircle(color = screwColor, radius = 5.dp.toPx(), center = pos)
-            drawCircle(color = screwHighlight, radius = 2.dp.toPx(), center = pos)
+            drawCircle(color = screwColor, radius = 5.5.dp.toPx(), center = pos)
+            drawCircle(color = goldAccent.copy(alpha = 0.5f), radius = 3.5.dp.toPx(), center = pos)
+            drawCircle(color = screwHighlight, radius = 1.5.dp.toPx(), center = pos)
         }
     }
 }
@@ -316,27 +326,29 @@ private fun WatchStrapTop() {
         modifier = Modifier
             .width(190.dp)
             .height(28.dp)
-            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+            .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        Color(0xFF141916),
-                        Color(0xFF1E2521),
-                        Color(0xFF161C18)
+                        Color(0xFF101714),
+                        Color(0xFF1D2823),
+                        Color(0xFF131A16)
                     )
                 )
             )
-            .border(1.dp, Color(0xFF2E3832), RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+            .border(1.dp, Color(0xFF3B4E44), RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp)),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Resin ribbed ridges on watch strap
+        // Luxury ribbed ridges on watch strap
         repeat(3) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
                     .height(2.dp)
-                    .background(Color(0xFF0C100E))
+                    .clip(RoundedCornerShape(1.dp))
+                    .background(Color(0xFF090E0C))
+                    .border(0.5.dp, Color(0x33597868))
             )
         }
     }
@@ -348,17 +360,17 @@ private fun WatchStrapBottom() {
         modifier = Modifier
             .width(190.dp)
             .height(28.dp)
-            .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+            .clip(RoundedCornerShape(bottomStart = 14.dp, bottomEnd = 14.dp))
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        Color(0xFF161C18),
-                        Color(0xFF1E2521),
-                        Color(0xFF141916)
+                        Color(0xFF131A16),
+                        Color(0xFF1D2823),
+                        Color(0xFF101714)
                     )
                 )
             )
-            .border(1.dp, Color(0xFF2E3832), RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+            .border(1.dp, Color(0xFF3B4E44), RoundedCornerShape(bottomStart = 14.dp, bottomEnd = 14.dp)),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -367,7 +379,9 @@ private fun WatchStrapBottom() {
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
                     .height(2.dp)
-                    .background(Color(0xFF0C100E))
+                    .clip(RoundedCornerShape(1.dp))
+                    .background(Color(0xFF090E0C))
+                    .border(0.5.dp, Color(0x33597868))
             )
         }
     }

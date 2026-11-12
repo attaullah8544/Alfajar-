@@ -60,12 +60,31 @@ class AlFajrCompactWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_al_fajr_compact).apply {
                 setTextViewText(R.id.tv_compact_location, settings.locationLabel.uppercase().take(12))
                 setTextViewText(R.id.tv_compact_hijri, hijriShort)
+
+                if (settings.is24Hour) {
+                    setCharSequence(R.id.tc_compact_live_clock, "setFormat24Hour", "HH:mm")
+                    setCharSequence(R.id.tc_compact_live_clock, "setFormat12Hour", "HH:mm")
+                } else {
+                    setCharSequence(R.id.tc_compact_live_clock, "setFormat12Hour", "hh:mm a")
+                    setCharSequence(R.id.tc_compact_live_clock, "setFormat24Hour", "hh:mm a")
+                }
                 setTextViewText(
                     R.id.tv_compact_next_name,
                     "NEXT: ${nextPrayer?.type?.englishName ?: "PRAYER"}"
                 )
                 setTextViewText(R.id.tv_compact_next_time, nextPrayerTimeStr)
                 setTextViewText(R.id.tv_compact_countdown, countdownStr)
+
+                // Apply background transparency
+                val (bgRes, bannerRes) = when (settings.widgetTransparencyPercent) {
+                    100 -> R.drawable.widget_bg_trans_100 to R.drawable.widget_banner_trans_100
+                    75 -> R.drawable.widget_bg_trans_75 to R.drawable.widget_banner_trans_75
+                    50 -> R.drawable.widget_bg_trans_50 to R.drawable.widget_banner_trans_50
+                    25 -> R.drawable.widget_bg_trans_25 to R.drawable.widget_banner_trans_25
+                    else -> R.drawable.widget_lcd_background to R.drawable.widget_inner_banner
+                }
+                setInt(R.id.widget_compact_root, "setBackgroundResource", bgRes)
+                setInt(R.id.layout_compact_countdown_banner, "setBackgroundResource", bannerRes)
 
                 // Launch App when widget tapped
                 val intent = Intent(context, MainActivity::class.java).apply {

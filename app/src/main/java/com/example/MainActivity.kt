@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -158,9 +159,10 @@ fun AlFajrWatchApp(viewModel: WatchViewModel) {
                 .background(
                     Brush.verticalGradient(
                         listOf(
-                            Color(0xFF0A0F0D),
-                            Color(0xFF111714),
-                            Color(0xFF090D0B)
+                            Color(0xFF080D0B),
+                            Color(0xFF101814),
+                            Color(0xFF0A100D),
+                            Color(0xFF050807)
                         )
                     )
                 ),
@@ -174,47 +176,75 @@ fun AlFajrWatchApp(viewModel: WatchViewModel) {
                     .padding(horizontal = 14.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Header Bar
+                // Header Bar (Classic Glassy Branding)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0x80101814))
+                        .border(1.dp, Color(0x334E725F), RoundedCornerShape(16.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(36.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFF1E2822)),
+                                .background(
+                                    Brush.linearGradient(
+                                        listOf(
+                                            Color(0xFF283B31),
+                                            Color(0xFF141F1A)
+                                        )
+                                    )
+                                )
+                                .border(1.dp, PrimaryGold.copy(alpha = 0.6f), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "الفجر",
-                                fontSize = 12.sp,
+                                fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = WatchGoldAccent
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
 
                         Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "AL-FAJR",
+                                    fontFamily = ChakraPetchFamily,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 17.sp,
+                                    color = WatchGoldAccent,
+                                    letterSpacing = 1.5.sp
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(Color(0x33F2C979))
+                                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                                ) {
+                                    Text(
+                                        text = "SAPPHIRE",
+                                        fontFamily = ChakraPetchFamily,
+                                        fontSize = 8.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PrimaryGold
+                                    )
+                                }
+                            }
                             Text(
-                                text = "AL-FAJR",
-                                fontFamily = ChakraPetchFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                color = WatchGoldAccent,
-                                letterSpacing = 1.sp
-                            )
-                            Text(
-                                text = "RETRO ISLAMIC PRAYER WATCH",
+                                text = "RETRO ISLAMIC TIMEPIECE",
                                 fontFamily = ChakraPetchFamily,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF7E9487),
+                                color = Color(0xFF8CA597),
                                 letterSpacing = 0.5.sp
                             )
                         }
@@ -296,29 +326,34 @@ fun AlFajrWatchApp(viewModel: WatchViewModel) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Quick Hint Card
+                // Quick Hint Card (Glassy Emerald)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF101713)),
-                    shape = RoundedCornerShape(12.dp)
+                    colors = CardDefaults.cardColors(containerColor = Color(0xB3101814)),
+                    shape = RoundedCornerShape(14.dp),
+                    border = CardDefaults.outlinedCardBorder().copy(
+                        brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                            listOf(Color(0x554E725F), Color(0x221E2C24))
+                        )
+                    )
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
+                            .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = null,
-                            tint = Color(0xFF6B8274),
+                            tint = PrimaryGold,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Tap the watch's side buttons (LIGHT, MODE, SET, ALARM) to experience genuine digital watch feedback, piezo beeps, and electro-luminescent glow.",
+                            text = "Tap the watch's side buttons (LIGHT, MODE, SET, ALARM) to experience genuine digital watch feedback, piezo beeps, and sapphire electro-luminescent glow.",
                             fontSize = 11.sp,
-                            color = Color(0xFF8BA093),
+                            color = Color(0xFFA5BDB0),
                             lineHeight = 15.sp
                         )
                     }
@@ -356,6 +391,7 @@ fun AlFajrWatchApp(viewModel: WatchViewModel) {
                 onSoundToggled = { viewModel.toggleSound() },
                 onFajrOffsetChanged = { viewModel.setFajrOffset(it) },
                 onHijriOffsetAdjusted = { viewModel.adjustHijriOffset(it) },
+                onWidgetTransparencyChanged = { viewModel.setWidgetTransparency(it) },
                 onDismiss = { showSettingsDialog = false }
             )
         }

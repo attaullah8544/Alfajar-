@@ -35,14 +35,24 @@ import com.example.model.PrayerTimeItem
 import com.example.model.PrayerType
 import com.example.model.WatchMode
 import com.example.model.WatchState
+import androidx.compose.ui.graphics.Brush
 import com.example.ui.theme.ChakraPetchFamily
+import com.example.ui.theme.GlassDigitColor
+import com.example.ui.theme.GlassDigitSecondary
+import com.example.ui.theme.GlassGhostSegment
+import com.example.ui.theme.GlassLcdBorder
+import com.example.ui.theme.GlassLcdInnerShadow
+import com.example.ui.theme.GlassLcdRimHighlight
+import com.example.ui.theme.GlassLcdSurface
+import com.example.ui.theme.GlassLcdSurfaceLight
 import com.example.ui.theme.LcdBacklight
 import com.example.ui.theme.LcdBacklightGhost
+import com.example.ui.theme.LcdBacklightSurface
 import com.example.ui.theme.LcdBacklightText
-import com.example.ui.theme.LcdGhostSegment
-import com.example.ui.theme.LcdScreenGreen
-import com.example.ui.theme.LcdScreenText
+import com.example.ui.theme.PrimaryGold
 import com.example.ui.theme.ShareTechMonoFamily
+import com.example.ui.theme.WatchGlassShine
+import com.example.ui.theme.WatchGoldAccent
 
 @Composable
 fun LcdScreen(
@@ -52,48 +62,83 @@ fun LcdScreen(
 ) {
     val isBacklight = state.isBacklightOn
 
-    val bgColor by animateColorAsState(
-        targetValue = if (isBacklight) LcdBacklight else LcdScreenGreen,
-        animationSpec = tween(durationMillis = 150),
-        label = "lcd_bg"
-    )
+    val bgGradient = if (isBacklight) {
+        listOf(LcdBacklightSurface, Color(0xFF0F382E), LcdBacklightSurface)
+    } else {
+        listOf(
+            Color(0xFF263A32),
+            GlassLcdSurfaceLight,
+            GlassLcdSurface,
+            Color(0xFF101915)
+        )
+    }
 
     val textColor by animateColorAsState(
-        targetValue = if (isBacklight) LcdBacklightText else LcdScreenText,
+        targetValue = if (isBacklight) LcdBacklightText else GlassDigitColor,
         animationSpec = tween(durationMillis = 150),
         label = "lcd_text"
     )
 
     val ghostColor by animateColorAsState(
-        targetValue = if (isBacklight) LcdBacklightGhost else LcdGhostSegment,
+        targetValue = if (isBacklight) LcdBacklightGhost else GlassGhostSegment,
         animationSpec = tween(durationMillis = 150),
         label = "lcd_ghost"
     )
 
-    // Inner bevel & bezel frame of LCD
+    // Classic Glass Beveled Frame with Sapphire Glass Sheen
     Box(
         modifier = modifier
             .testTag("lcd_screen_container")
-            .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp), clip = false)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF0F1612)) // Dark recess
-            .border(2.dp, Color(0xFF1E2B23), RoundedCornerShape(16.dp))
+            .shadow(elevation = 12.dp, shape = RoundedCornerShape(20.dp), clip = false)
+            .clip(RoundedCornerShape(20.dp))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF1E2C26),
+                        Color(0xFF0E1612),
+                        Color(0xFF080C0A)
+                    )
+                )
+            )
+            .border(2.dp, GlassLcdRimHighlight, RoundedCornerShape(20.dp))
             .padding(6.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(10.dp))
-                .background(bgColor)
-                .border(1.dp, Color(0x33000000), RoundedCornerShape(10.dp))
-                .padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .clip(RoundedCornerShape(14.dp))
+                .background(Brush.linearGradient(bgGradient))
+                .border(1.5.dp, GlassLcdBorder, RoundedCornerShape(14.dp))
         ) {
-            // TOP STATUS & FLAGS ROW
-            LcdTopStatusRow(state = state, textColor = textColor, ghostColor = ghostColor)
+            // Diagonal optical glass specular reflection
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                WatchGlassShine,
+                                Color(0x0AFFFFFF),
+                                Color.Transparent,
+                                Color(0x10FFFFFF)
+                            ),
+                            start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                            end = androidx.compose.ui.geometry.Offset(500f, 500f)
+                        )
+                    )
+            )
 
-            // MAIN CONTENT DEPENDING ON MODE
-            when (state.mode) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // TOP STATUS & FLAGS ROW
+                LcdTopStatusRow(state = state, textColor = textColor, ghostColor = ghostColor)
+
+                // MAIN CONTENT DEPENDING ON MODE
+                when (state.mode) {
                 WatchMode.TIME -> {
                     LcdMainTimeContent(
                         state = state,
@@ -136,8 +181,7 @@ fun LcdScreen(
                 LcdBottomPrayerTable(
                     prayers = state.prayers,
                     is24Hour = state.settings.is24Hour,
-                    textColor = textColor,
-                    lcdBgColor = bgColor
+                    textColor = textColor
                 )
             } else {
                 // In sub-modes, show a navigation helper footer
@@ -149,6 +193,7 @@ fun LcdScreen(
             }
         }
     }
+}
 }
 
 @Composable
@@ -419,10 +464,10 @@ private fun LcdNextPrayerBanner(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(6.dp))
-            .background(textColor.copy(alpha = 0.08f))
-            .border(1.dp, textColor.copy(alpha = 0.25f), RoundedCornerShape(6.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0x330A1410))
+            .border(1.dp, GlassLcdBorder, RoundedCornerShape(8.dp))
+            .padding(horizontal = 10.dp, vertical = 5.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -479,15 +524,14 @@ private fun LcdNextPrayerBanner(
 private fun LcdBottomPrayerTable(
     prayers: List<PrayerTimeItem>,
     is24Hour: Boolean,
-    textColor: Color,
-    lcdBgColor: Color
+    textColor: Color
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(6.dp))
-            .background(textColor.copy(alpha = 0.05f))
-            .border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0x330E1814))
+            .border(1.dp, GlassLcdBorder, RoundedCornerShape(8.dp))
             .padding(4.dp)
     ) {
         Row(
@@ -499,7 +543,6 @@ private fun LcdBottomPrayerTable(
                 val timeStr = if (is24Hour) {
                     prayer.formatted24h
                 } else {
-                    // Short 12h without AM/PM for compact LCD table
                     prayer.formatted12h.replace(" AM", "").replace(" PM", "")
                 }
 
@@ -507,8 +550,13 @@ private fun LcdBottomPrayerTable(
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 1.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(if (isNext) textColor else Color.Transparent)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(if (isNext) Color(0x33F2C979) else Color.Transparent)
+                        .border(
+                            width = if (isNext) 1.dp else 0.dp,
+                            color = if (isNext) WatchGoldAccent else Color.Transparent,
+                            shape = RoundedCornerShape(4.dp)
+                        )
                         .padding(vertical = 3.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -517,7 +565,7 @@ private fun LcdBottomPrayerTable(
                         fontFamily = ChakraPetchFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 9.sp,
-                        color = if (isNext) lcdBgColor else textColor
+                        color = if (isNext) WatchGoldAccent else textColor.copy(alpha = 0.75f)
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
@@ -525,7 +573,7 @@ private fun LcdBottomPrayerTable(
                         fontFamily = ShareTechMonoFamily,
                         fontWeight = if (isNext) FontWeight.Bold else FontWeight.Normal,
                         fontSize = 11.sp,
-                        color = if (isNext) lcdBgColor else textColor,
+                        color = if (isNext) WatchGoldAccent else textColor,
                         maxLines = 1
                     )
                 }

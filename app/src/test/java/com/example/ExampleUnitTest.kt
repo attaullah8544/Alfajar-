@@ -100,4 +100,13 @@ class ExampleUnitTest {
         val usMethod = com.example.model.LocationDefaultsHelper.recommendCalculationMethod("us", "United States")
         assertEquals(CalculationMethod.NORTH_AMERICA, usMethod)
     }
+
+    @Test
+    fun watchSettings_widgetTransparency_defaultsToSolidZero() {
+        val settings = WatchSettings()
+        assertEquals(0, settings.widgetTransparencyPercent)
+
+        val transparentSettings = settings.copy(widgetTransparencyPercent = 100)
+        assertEquals(100, transparentSettings.widgetTransparencyPercent)
+    }
 }

@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <!-- Top line: City and Next Prayer Name -->
+    <!-- Top line: City, Clock & Hijri -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="KARACHI"
-            android:textColor="#151E18"
+            android:textColor="#E5BA69"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <!-- Live compact clock -->
+        <TextClock
+            android:id="@+id/tc_compact_live_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="hh:mm a"
+            android:format24Hour="HH:mm"
+            android:textColor="#FFFFFF"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -29,17 +40,18 @@
             android:id="@+id/tv_compact_hijri"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="08 RABI' II"
-            android:textColor="#151E18"
-            android:textSize="11sp"
+            android:textColor="#A0B8AB"
+            android:textSize="10sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Center Next Prayer & Time -->
+    <!-- Center Next Prayer & Countdown -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="5dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -54,7 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="NEXT: ASR"
-                android:textColor="#151E18"
+                android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -63,25 +75,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="03:45 PM"
-                android:textColor="#151E18"
-                android:textSize="12sp"
+                android:textColor="#C5D9CE"
+                android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <!-- Countdown badge -->
         <LinearLayout
+            android:id="@+id/layout_compact_countdown_banner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/widget_inner_banner"
+            android:gravity="center"
             android:orientation="vertical"
-            android:paddingHorizontal="8dp"
+            android:paddingHorizontal="10dp"
             android:paddingVertical="4dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="COUNTDOWN"
-                android:textColor="#9EA78C"
+                android:textColor="#8FB5A2"
                 android:textSize="8sp"
                 android:textStyle="bold" />
 
@@ -91,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:text="01:24:00"
                 android:textColor="#E5BA69"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
