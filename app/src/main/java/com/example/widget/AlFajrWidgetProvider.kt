@@ -6,7 +6,9 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.os.Bundle
+import android.os.SystemClock
+import android.view.View
 import android.widget.RemoteViews
 import com.batoulapps.adhan.Madhab
 import com.example.MainActivity
@@ -16,13 +18,23 @@ import com.example.model.HijriCalendarHelper
 import com.example.model.PrayerTimeItem
 import com.example.model.PrayerType
 import com.example.service.PrayerCalculator
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 class AlFajrWidgetProvider : AppWidgetProvider() {
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        when (intent.action) {
+            WidgetUpdateScheduler.ACTION_REFRESH_WIDGETS,
+            Intent.ACTION_TIME_CHANGED,
+            Intent.ACTION_TIMEZONE_CHANGED,
+            Intent.ACTION_DATE_CHANGED,
+            Intent.ACTION_LOCALE_CHANGED -> {
+                updateAllWidgets(context)
+            }
+        }
+    }
 
     override fun onUpdate(
         context: Context,
@@ -31,6 +43,23 @@ class AlFajrWidgetProvider : AppWidgetProvider() {
     ) {
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
+        }
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle?
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        updateAppWidget(context, appWidgetManager, appWidgetId)
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        if (!WidgetUpdateScheduler.hasActiveWidgets(context)) {
+            WidgetUpdateScheduler.cancelUpdates(context)
         }
     }
 
@@ -58,66 +87,61 @@ class AlFajrWidgetProvider : AppWidgetProvider() {
             val prefs = WatchPreferences(context)
             val settings = prefs.loadSettings()
             val now = Date()
-            val calendar = Calendar.getInstance().apply { time = now }
 
             val calc = PrayerCalculator.calculate(settings, now)
-
             val is24H = settings.is24Hour
-            val clockStr = if (is24H) {
-                String.format(Locale.ENGLISH, "%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE))
-            } else {
-                val h = calendar.get(Calendar.HOUR)
-                val h12 = if (h == 0) 12 else h
-                String.format(Locale.ENGLISH, "%02d:%02d", h12, calendar.get(Calendar.MINUTE))
-            }
-            val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
-
-            val dayFormat = SimpleDateFormat("EEE dd MMM", Locale.ENGLISH)
-            val gregorianStr = dayFormat.format(now).uppercase()
 
             val hijriStr = HijriCalendarHelper.getHijriDate(
                 localDate = LocalDate.now(),
                 offsetDays = settings.hijriOffsetDays
             )
 
-            val countdownMs = calc.countdownMs
-            val totalSec = countdownMs / 1000
-            val h = totalSec / 3600
-            val m = (totalSec % 3600) / 60
-            val s = totalSec % 60
-            val countdownStr = String.format(Locale.ENGLISH, "%02d:%02d:%02d", h, m, s)
-
             val nextPrayer = calc.nextPrayer
 
-            val madhabTag = if (settings.madhab == Madhab.HANAFI) "HNF" else "SHF"
-            val flagsStr = "ALM • PRAY • $madhabTag"
+            // Dynamic status flags reflecting all active watch settings
+            val statusFlags = mutableListOf<String>()
+            if (settings.fajrAlarmEnabled) statusFlags.add("ALM")
+            if (settings.prayerAlertEnabled) statusFlags.add("PRAY")
+            statusFlags.add(if (settings.madhab == Madhab.HANAFI) "HNF" else "SHF")
+            statusFlags.add(if (is24H) "24H" else "12H")
+            if (!settings.soundEnabled) statusFlags.add("MUTE")
+            val flagsStr = statusFlags.joinToString(" • ")
+
+            val baseElapsed = SystemClock.elapsedRealtime() + calc.countdownMs
 
             val views = RemoteViews(context.packageName, R.layout.widget_al_fajr_full).apply {
                 setTextViewText(R.id.tv_widget_location, settings.locationLabel.uppercase().take(12))
                 setTextViewText(R.id.tv_widget_flags, flagsStr)
-                setTextViewText(R.id.tv_widget_gregorian, gregorianStr)
                 setTextViewText(R.id.tv_widget_hijri, hijriStr)
 
-                // Configure live TextClock formats according to 12h / 24h setting
+                // Live Gregorian Date TextClock (auto-updates at midnight)
+                setCharSequence(R.id.tc_widget_gregorian, "setFormat12Hour", "EEE dd MMM")
+                setCharSequence(R.id.tc_widget_gregorian, "setFormat24Hour", "EEE dd MMM")
+
+                // Live Clock + Seconds + AM/PM TextClocks
                 if (is24H) {
                     setCharSequence(R.id.tc_widget_clock, "setFormat24Hour", "HH:mm")
                     setCharSequence(R.id.tc_widget_clock, "setFormat12Hour", "HH:mm")
-                    setCharSequence(R.id.tc_widget_ampm, "setFormat24Hour", "")
-                    setCharSequence(R.id.tc_widget_ampm, "setFormat12Hour", "")
+                    setViewVisibility(R.id.tc_widget_ampm, View.GONE)
                 } else {
                     setCharSequence(R.id.tc_widget_clock, "setFormat12Hour", "hh:mm")
                     setCharSequence(R.id.tc_widget_clock, "setFormat24Hour", "hh:mm")
                     setCharSequence(R.id.tc_widget_ampm, "setFormat12Hour", "a")
                     setCharSequence(R.id.tc_widget_ampm, "setFormat24Hour", "a")
+                    setViewVisibility(R.id.tc_widget_ampm, View.VISIBLE)
                 }
+                setCharSequence(R.id.tc_widget_seconds, "setFormat12Hour", "ss")
+                setCharSequence(R.id.tc_widget_seconds, "setFormat24Hour", "ss")
 
+                // Next Prayer Name & Live Counting Chronometer ("IN HH:MM:SS")
                 setTextViewText(
                     R.id.tv_widget_next_name,
                     "${nextPrayer?.type?.englishName ?: "PRAYER"} (${nextPrayer?.type?.arabicName ?: ""})"
                 )
-                setTextViewText(R.id.tv_widget_next_countdown, "IN $countdownStr")
+                setChronometerCountDown(R.id.chrono_widget_countdown, true)
+                setChronometer(R.id.chrono_widget_countdown, baseElapsed, "IN %s", true)
 
-                // Bind 6 prayers
+                // Bind 6 prayers with active/passed highlighting
                 bindPrayerTimes(this, calc.prayers, is24H)
 
                 // Apply background transparency
@@ -145,6 +169,7 @@ class AlFajrWidgetProvider : AppWidgetProvider() {
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
+            WidgetUpdateScheduler.scheduleNextUpdate(context, nextPrayer?.time?.time)
         }
 
         private fun bindPrayerTimes(
@@ -158,19 +183,50 @@ class AlFajrWidgetProvider : AppWidgetProvider() {
                 else item.formatted12h.replace(" AM", "").replace(" PM", "")
             }
 
-            val fajr = prayers.find { it.type == PrayerType.FAJR }
-            val shurooq = prayers.find { it.type == PrayerType.SHUROOQ }
-            val dhuhr = prayers.find { it.type == PrayerType.DHUHR }
-            val asr = prayers.find { it.type == PrayerType.ASR }
-            val maghrib = prayers.find { it.type == PrayerType.MAGHRIB }
-            val isha = prayers.find { it.type == PrayerType.ISHA }
+            data class PrayerSlot(
+                val type: PrayerType,
+                val layoutId: Int,
+                val labelId: Int,
+                val timeId: Int
+            )
 
-            views.setTextViewText(R.id.tv_time_fajr, formatTime(fajr))
-            views.setTextViewText(R.id.tv_time_shurooq, formatTime(shurooq))
-            views.setTextViewText(R.id.tv_time_dhuhr, formatTime(dhuhr))
-            views.setTextViewText(R.id.tv_time_asr, formatTime(asr))
-            views.setTextViewText(R.id.tv_time_maghrib, formatTime(maghrib))
-            views.setTextViewText(R.id.tv_time_isha, formatTime(isha))
+            val slots = listOf(
+                PrayerSlot(PrayerType.FAJR, R.id.layout_fajr, R.id.tv_label_fajr, R.id.tv_time_fajr),
+                PrayerSlot(PrayerType.SHUROOQ, R.id.layout_shurooq, R.id.tv_label_shurooq, R.id.tv_time_shurooq),
+                PrayerSlot(PrayerType.DHUHR, R.id.layout_dhuhr, R.id.tv_label_dhuhr, R.id.tv_time_dhuhr),
+                PrayerSlot(PrayerType.ASR, R.id.layout_asr, R.id.tv_label_asr, R.id.tv_time_asr),
+                PrayerSlot(PrayerType.MAGHRIB, R.id.layout_maghrib, R.id.tv_label_maghrib, R.id.tv_time_maghrib),
+                PrayerSlot(PrayerType.ISHA, R.id.layout_isha, R.id.tv_label_isha, R.id.tv_time_isha)
+            )
+
+            val goldColor = 0xFFE5BA69.toInt()
+            val normalLabelColor = 0xFF8FB5A2.toInt()
+            val normalTimeColor = 0xFFF4FAF6.toInt()
+            val passedLabelColor = 0x778FB5A2.toInt()
+            val passedTimeColor = 0x88F4FAF6.toInt()
+
+            slots.forEach { slot ->
+                val item = prayers.find { it.type == slot.type }
+                views.setTextViewText(slot.timeId, formatTime(item))
+
+                when {
+                    item?.isNext == true -> {
+                        views.setInt(slot.layoutId, "setBackgroundResource", R.drawable.widget_prayer_pill_active)
+                        views.setTextColor(slot.labelId, goldColor)
+                        views.setTextColor(slot.timeId, goldColor)
+                    }
+                    item?.isPassed == true -> {
+                        views.setInt(slot.layoutId, "setBackgroundResource", 0)
+                        views.setTextColor(slot.labelId, passedLabelColor)
+                        views.setTextColor(slot.timeId, passedTimeColor)
+                    }
+                    else -> {
+                        views.setInt(slot.layoutId, "setBackgroundResource", 0)
+                        views.setTextColor(slot.labelId, normalLabelColor)
+                        views.setTextColor(slot.timeId, normalTimeColor)
+                    }
+                }
+            }
         }
     }
 }

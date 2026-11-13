@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
+import android.os.SystemClock
 import android.widget.RemoteViews
 import com.example.MainActivity
 import com.example.R
@@ -13,9 +15,21 @@ import com.example.model.HijriCalendarHelper
 import com.example.service.PrayerCalculator
 import java.time.LocalDate
 import java.util.Date
-import java.util.Locale
 
 class AlFajrCompactWidgetProvider : AppWidgetProvider() {
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        when (intent.action) {
+            WidgetUpdateScheduler.ACTION_REFRESH_WIDGETS,
+            Intent.ACTION_TIME_CHANGED,
+            Intent.ACTION_TIMEZONE_CHANGED,
+            Intent.ACTION_DATE_CHANGED,
+            Intent.ACTION_LOCALE_CHANGED -> {
+                AlFajrWidgetProvider.updateAllWidgets(context)
+            }
+        }
+    }
 
     override fun onUpdate(
         context: Context,
@@ -24,6 +38,23 @@ class AlFajrCompactWidgetProvider : AppWidgetProvider() {
     ) {
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
+        }
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle?
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        updateAppWidget(context, appWidgetManager, appWidgetId)
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        if (!WidgetUpdateScheduler.hasActiveWidgets(context)) {
+            WidgetUpdateScheduler.cancelUpdates(context)
         }
     }
 
@@ -46,16 +77,11 @@ class AlFajrCompactWidgetProvider : AppWidgetProvider() {
             )
             val hijriShort = String.format("%02d %s", day, month)
 
-            val countdownMs = calc.countdownMs
-            val totalSec = countdownMs / 1000
-            val h = totalSec / 3600
-            val m = (totalSec % 3600) / 60
-            val s = totalSec % 60
-            val countdownStr = String.format(Locale.ENGLISH, "%02d:%02d:%02d", h, m, s)
-
             val nextPrayerTimeStr = if (nextPrayer != null) {
                 if (settings.is24Hour) nextPrayer.formatted24h else nextPrayer.formatted12h
             } else "--:--"
+
+            val baseElapsed = SystemClock.elapsedRealtime() + calc.countdownMs
 
             val views = RemoteViews(context.packageName, R.layout.widget_al_fajr_compact).apply {
                 setTextViewText(R.id.tv_compact_location, settings.locationLabel.uppercase().take(12))
@@ -68,12 +94,16 @@ class AlFajrCompactWidgetProvider : AppWidgetProvider() {
                     setCharSequence(R.id.tc_compact_live_clock, "setFormat12Hour", "hh:mm a")
                     setCharSequence(R.id.tc_compact_live_clock, "setFormat24Hour", "hh:mm a")
                 }
+
                 setTextViewText(
                     R.id.tv_compact_next_name,
                     "NEXT: ${nextPrayer?.type?.englishName ?: "PRAYER"}"
                 )
                 setTextViewText(R.id.tv_compact_next_time, nextPrayerTimeStr)
-                setTextViewText(R.id.tv_compact_countdown, countdownStr)
+
+                // Live counting Chronometer for IN countdown
+                setChronometerCountDown(R.id.chrono_compact_countdown, true)
+                setChronometer(R.id.chrono_compact_countdown, baseElapsed, "%s", true)
 
                 // Apply background transparency
                 val (bgRes, bannerRes) = when (settings.widgetTransparencyPercent) {
@@ -100,6 +130,7 @@ class AlFajrCompactWidgetProvider : AppWidgetProvider() {
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
+            WidgetUpdateScheduler.scheduleNextUpdate(context, nextPrayer?.time?.time)
         }
     }
 }

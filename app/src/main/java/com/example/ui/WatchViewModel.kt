@@ -40,11 +40,21 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
 
     private var tickerJob: Job? = null
     private var backlightTimerJob: Job? = null
+    private var lastSyncedNextPrayerType: com.example.model.PrayerType? = null
+    private var lastSyncedGregorianDate: String? = null
+    private var lastSyncedHijriDate: String? = null
 
     init {
         val savedSettings = preferences.loadSettings()
         _state.update { it.copy(settings = savedSettings) }
         startWatchTicker()
+        refreshWidgetsSafely()
+    }
+
+    fun refreshWidgetsSafely() {
+        try {
+            com.example.widget.AlFajrWidgetProvider.updateAllWidgets(getApplication())
+        } catch (_: Exception) {}
     }
 
     private fun startWatchTicker() {
@@ -97,6 +107,20 @@ class WatchViewModel(application: Application) : AndroidViewModel(application) {
 
         if (isAlarmTime && !_state.value.isAlarmRinging) {
             triggerAlarm()
+        }
+
+        // Keep widgets synced automatically whenever the active prayer or day rolls over
+        val currentNextType = calc.nextPrayer?.type
+        val shouldSyncWidgets = (lastSyncedNextPrayerType != null && lastSyncedNextPrayerType != currentNextType) ||
+                (lastSyncedGregorianDate != null && lastSyncedGregorianDate != gregorianDate) ||
+                (lastSyncedHijriDate != null && lastSyncedHijriDate != hijriDetails.fullDateEn)
+
+        lastSyncedNextPrayerType = currentNextType
+        lastSyncedGregorianDate = gregorianDate
+        lastSyncedHijriDate = hijriDetails.fullDateEn
+
+        if (shouldSyncWidgets) {
+            refreshWidgetsSafely()
         }
 
         _state.update { current ->

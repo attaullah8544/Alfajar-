@@ -41,12 +41,14 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_widget_gregorian"
+        <TextClock
+            android:id="@+id/tc_widget_gregorian"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="MON 19 OCT"
+            android:format12Hour="EEE dd MMM"
+            android:format24Hour="EEE dd MMM"
+            android:textAllCaps="true"
             android:textColor="#C5D9CE"
             android:textSize="11sp" />
 
@@ -72,22 +74,42 @@
             android:id="@+id/tc_widget_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="monospace"
             android:format12Hour="hh:mm"
             android:format24Hour="HH:mm"
             android:textColor="#F4FAF6"
-            android:textSize="36sp"
+            android:textSize="34sp"
             android:textStyle="bold" />
 
-        <TextClock
-            android:id="@+id/tc_widget_ampm"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:format12Hour="a"
-            android:format24Hour=""
-            android:textColor="#E5BA69"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:layout_marginStart="5dp"
+            android:gravity="start"
+            android:orientation="vertical">
+
+            <TextClock
+                android:id="@+id/tc_widget_seconds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:format12Hour="ss"
+                android:format24Hour="ss"
+                android:textColor="#C5D9CE"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextClock
+                android:id="@+id/tc_widget_ampm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="a"
+                android:format24Hour=""
+                android:textAllCaps="true"
+                android:textColor="#E5BA69"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Next Prayer Countdown Banner -->
@@ -120,11 +142,13 @@
             android:textSize="11sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tv_widget_next_countdown"
+        <Chronometer
+            android:id="@+id/chrono_widget_countdown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="IN 01:24:00"
+            android:countDown="true"
+            android:fontFamily="monospace"
+            android:format="IN %s"
             android:textColor="#E5BA69"
             android:textSize="12sp"
             android:textStyle="bold" />
